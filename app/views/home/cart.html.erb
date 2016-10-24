@@ -1,0 +1,87 @@
+<h1>Your shopping cart</h1>
+<table>
+  <% @products.each do |product| %>
+  <tr>
+    <td><%= product.title %></td>
+    <td><%= number_to_currency(product.price) %></td>
+    <td><%= link_to 'Remove', remove_from_cart_path(product), method: :delete %></td>
+  </tr>
+  <% end %>
+  <tr>
+    <td align="right">Total:</td>
+    <td><%= number_to_currency(@total_price) %></td>
+  </tr>
+</table>
+
+<script type="text/javascript" src="https://js.stripe.com/v2/"></script>
+<script type="text/javascript">
+  Stripe.setPublishableKey('pk_test_pe6JcuQBoKTlsMGW4T9aJGf6');
+</script>
+<script>
+  $(function() {
+    var $form = $('#payment-form');
+    $form.submit(function(event) {
+      // Disable the submit button to prevent repeated clicks:
+      $form.find('.submit').prop('disabled', true);
+
+      // Request a token from Stripe:
+      Stripe.card.createToken($form, stripeResponseHandler);
+
+      // Prevent the form from being submitted:
+      return false;
+    });
+
+    function stripeResponseHandler(status, response) {
+      // Grab the form:
+      var $form = $('#payment-form');
+
+      if (response.error) { // Problem!
+
+        // Show the errors on the form:
+        $form.find('.payment-errors').text(response.error.message);
+        $form.find('.submit').prop('disabled', false); // Re-enable submission
+
+      } else { // Token was created!
+
+        // Get the token ID:
+        var token = response.id;
+
+        // Insert the token ID into the form so it gets submitted to the server:
+        $form.append($('<input type="hidden" name="stripeToken">').val(token));
+
+        // Submit the form:
+        $form.get(0).submit();
+      }
+    };
+  });
+</script>
+<hr>
+<%= form_tag '/cart', id: 'payment-form' do %>
+  <span class="payment-errors"></span>
+
+  <div class="form-row">
+    <label>
+      <span>Card Number</span>
+      <input type="text" size="20" maxlength="16" name="number" value="4111111111111111" data-stripe="number">
+    </label>
+  </div>
+
+  <div class="form-row">
+    <label>
+      <span>Expiration (MM/YY)</span>
+      <input type="text" size="2" value="12" data-stripe="exp_month">
+    </label>
+    <span> / </span>
+    <input type="text" size="2" value="2019" data-stripe="exp_year">
+  </div>
+
+  <div class="form-row">
+    <label>
+      <span>CVC</span>
+      <input type="text" value="111" size="4" data-stripe="cvc">
+    </label>
+  </div>
+
+
+  <input type="submit" class="submit" value="Submit Payment">
+<% end %>

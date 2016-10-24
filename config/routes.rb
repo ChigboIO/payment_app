@@ -1,5 +1,14 @@
 Rails.application.routes.draw do
-  match 'home/index', via: [:post, :get]
+  resources :orders
+  resources :products
+
+  delete 'remove_from_cart/:id' => 'home#remove_from_cart', as: :remove_from_cart
+  post 'add_to_cart/:id' => 'home#add_to_cart', as: :add_to_cart
+  match 'cart' => 'home#cart', as: :cart, via: [:post, :get]
+  get 'thanks/:id' => 'home#thanks', as: :thanks
+  get 'charges' => 'home#charges', as: :charges
+
+  root to: 'home#index'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

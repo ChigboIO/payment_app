@@ -1,0 +1,2 @@
+<h1>Thank you</h1>
+You just bought <%= @order.line_items.count %> products: <%= @order.line_items.map(&:product).map(&:title).join(', ') %>

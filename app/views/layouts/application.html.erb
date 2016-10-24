@@ -8,7 +8,16 @@
 </head>
 <body>
 
-<%= yield %>
+  <div class="container">
+    <div style="float: right">
+      <% if session[:cart].present? %>
+        Your cart has <%= link_to "#{session[:cart].count} products", cart_path %>.
+      <% else %>
+        Your cart is empty.
+      <% end %>
+    </div>
+    <%= yield %>
+  </div>
 
 </body>
 </html>

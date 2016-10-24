@@ -1,0 +1,5 @@
+<ul>
+<% Stripe::Charge.list.each do |charge| %>
+  <li><%= charge.inspect %></li>
+<% end %>
+</ul>
